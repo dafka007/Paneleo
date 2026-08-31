@@ -353,7 +353,7 @@ def sanitize_settings(settings, strict=False):
     for key in ("comic_dir", "last_local_file"):
         if key in settings:
             out[key] = _safe_text(settings.get(key), 32768)
-    for key in ("last_local_page", "last_local_total", "recent_cleared_at"):
+    for key in ("last_local_page", "last_local_total", "last_local_opened", "recent_cleared_at"):
         if key in settings:
             out[key] = _safe_int(settings.get(key), 0, 2_147_483_647)
     for key in ("sidebar_collapsed", "window_maximized"):
@@ -2534,6 +2534,7 @@ class MainWindow(QMainWindow):
         self.last_local_file = self.settings.get("last_local_file", "")
         self.last_local_page = int(self.settings.get("last_local_page", 0) or 0)
         self.last_local_total = int(self.settings.get("last_local_total", 0) or 0)
+        self.last_local_opened = int(self.settings.get("last_local_opened", 0) or 0)
         self.last_batcave_url = safe_batcave_url(self.settings.get("last_batcave_url", BATCAVE_URL))
         raw_last_issue = self.settings.get("last_batcave_issue_url", "")
         self.last_batcave_issue_url = raw_last_issue if is_allowed_batcave_url(raw_last_issue) else ""
@@ -3212,6 +3213,7 @@ class MainWindow(QMainWindow):
             self.refresh_home()
         elif index == self.LIBRARY:
             self.lib_btn.setChecked(True)
+            self.scan_library()
         elif index == self.BATCAVE:
             self.web_btn.setChecked(True)
         elif index == self.READING_LIST:
@@ -4369,7 +4371,8 @@ class MainWindow(QMainWindow):
         else:
             self.home_folder_label.setText("Choose a folder to build your local library")
 
-        if self.last_local_file and Path(self.last_local_file).exists():
+        local_available = bool(self.last_local_file and Path(self.last_local_file).exists())
+        if local_available:
             name = Path(self.last_local_file).stem
             page = self.last_local_page + 1
             total = self.last_local_total
@@ -4396,7 +4399,12 @@ class MainWindow(QMainWindow):
         self._home_continue_url = ""
         self._home_continue_page = 0
 
-        if latest is not None:
+        local_is_latest = bool(
+            local_available
+            and (latest is None or self.last_local_opened >= latest[0])
+        )
+
+        if latest is not None and not local_is_latest:
             _, key, data = latest
             url = data.get("url", key)
             title = self._clean_batcave_title(data.get("title", ""), url)
@@ -4433,7 +4441,7 @@ class MainWindow(QMainWindow):
             _, _, accent = self._series_palette(series_name or display_title)
             self.home_hero_accent.setStyleSheet(f"background:{accent}; border:none;")
             self._request_series_cover(series_name, self.home_cover_art)
-        elif self.last_local_file and Path(self.last_local_file).exists():
+        elif local_available:
             name = Path(self.last_local_file).stem
             current = self.last_local_page + 1
             total = self.last_local_total
@@ -4838,15 +4846,29 @@ class MainWindow(QMainWindow):
 
     def scan_library(self):
         self.library_list.clear()
-        if not self.comic_dir or not Path(self.comic_dir).exists():
+        folder_available = bool(self.comic_dir and Path(self.comic_dir).exists())
+        if folder_available:
+            self.folder_label.setText(self.comic_dir)
+            files = [
+                path for path in Path(self.comic_dir).rglob("*")
+                if path.is_file() and path.suffix.lower() in SUPPORTED
+            ]
+        else:
             self.folder_label.setText("No comics folder selected")
-            self.refresh_home()
-            return
-        self.folder_label.setText(self.comic_dir)
-        files = sorted(
-            [p for p in Path(self.comic_dir).rglob("*") if p.is_file() and p.suffix.lower() in SUPPORTED],
-            key=natural_key,
-        )
+            files = []
+
+        # A comic opened directly is still part of the user's local reading
+        # history even when no library folder has been selected. Keep the most
+        # recent standalone file visible alongside any folder-scanned files.
+        standalone = Path(self.last_local_file) if self.last_local_file else None
+        if standalone and standalone.is_file() and standalone.suffix.lower() in SUPPORTED:
+            known = {os.path.normcase(str(path.resolve())) for path in files}
+            if os.path.normcase(str(standalone.resolve())) not in known:
+                files.append(standalone)
+            if not folder_available:
+                self.folder_label.setText("Recently opened comic · no comics folder selected")
+
+        files = sorted(files, key=natural_key)
         for path in files:
             item = QListWidgetItem(path.stem)
             item.setData(Qt.ItemDataRole.UserRole, str(path))
@@ -4925,9 +4947,11 @@ class MainWindow(QMainWindow):
         self.last_local_file = path
         self.last_local_page = page
         self.last_local_total = total
+        self.last_local_opened = int(time.time())
         self.settings["last_local_file"] = path
         self.settings["last_local_page"] = page
         self.settings["last_local_total"] = total
+        self.settings["last_local_opened"] = self.last_local_opened
         save_json(SETTINGS_FILE, self.settings)
 
     def _clean_batcave_title(self, title, url=""):

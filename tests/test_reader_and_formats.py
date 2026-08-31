@@ -63,6 +63,39 @@ def test_keyboard_arrow_navigation(main_window, comic_files):
     assert main_window.reader.page_index == 0
 
 
+def test_standalone_comic_remains_available_after_returning_home(
+    main_window, paneleo_module, comic_files
+):
+    main_window.open_comic(str(comic_files.cbz))
+    main_window.reader.next_page()
+    QTest.qWait(60)
+
+    local_opened = int(main_window.settings.get("last_local_opened", 0) or 0)
+    assert local_opened > 0
+    main_window.batcave_library["issues"] = {
+        "https://batcave.biz/reader/regression": {
+            "url": "https://batcave.biz/reader/regression",
+            "title": "Older BatCave Issue #1",
+            "series": "Older BatCave Issue",
+            "issue": "1",
+            "current_page": 3,
+            "total_pages": 20,
+            "last_opened": local_opened - 1,
+        }
+    }
+
+    main_window.show_page(paneleo_module.MainWindow.HOME)
+    assert main_window._home_primary_mode == "local"
+    assert main_window.home_continue_title.text() == comic_files.cbz.stem
+
+    main_window.show_page(paneleo_module.MainWindow.LIBRARY)
+    paths = {
+        main_window.library_list.item(index).data(Qt.ItemDataRole.UserRole)
+        for index in range(main_window.library_list.count())
+    }
+    assert str(comic_files.cbz) in paths
+
+
 def test_unsafe_cbz_path_is_rejected(paneleo_module, comic_files, tmp_path):
     archive_path = tmp_path / "unsafe.cbz"
     with zipfile.ZipFile(archive_path, "w", zipfile.ZIP_DEFLATED) as archive:
