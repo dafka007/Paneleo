@@ -1260,9 +1260,9 @@ class BrowserWidget(QWidget):
         cl.addWidget(self.external)
         root.addWidget(self.controls)
 
-        # v1.3.13: permanent reader-control strip outside the QWebEngineView.
-        # Keeping the reveal handle and floating controls in a native Qt layout
-        # above the webview means their clicks can never fall through to
+        # Keep the reader controls in a permanent native strip outside the
+        # QWebEngineView. Placing the reveal handle and floating controls above
+        # the webview means their clicks can never fall through to
         # BatCave's click-to-turn/scroll handlers. The strip stays the same
         # height while reading, so hiding/showing controls cannot move the page.
         self.reader_control_strip = QFrame()
@@ -1383,8 +1383,8 @@ class BrowserWidget(QWidget):
         self.reader_exit.setToolTip("Show full controls (Esc)")
         self.reader_exit.clicked.connect(lambda: self.set_reading_mode(False))
 
-        # v0.8.0: hard mouse isolation for the floating toolbar.  A press on a
-        # Qt overlay button must never leak its release/click into BatCave's
+        # Isolate mouse input for the floating toolbar. A press on a Qt overlay
+        # button must never leak its release/click into BatCave's
         # web view, where it would be interpreted as "turn page".
         for ctl in (self.reader_back, self.reader_home, self.reader_list, self.reader_bookmark,
                     self.reader_zoom_out, self.reader_fit, self.reader_zoom_in,
@@ -1405,8 +1405,8 @@ class BrowserWidget(QWidget):
         self.reader_nav.hide()
         self.reader_nav.raise_()
 
-        # v1.3.13: the persistent reveal handle lives in the native control
-        # strip, never over the webview. It therefore needs no mouse shielding.
+        # The persistent reveal handle lives in the native control strip, never
+        # over the webview, so it needs no mouse shielding.
         self.reader_handle = QPushButton("☰", self.reader_control_strip)
         self.reader_handle.setObjectName("readerHandle")
         self.reader_handle.setFixedSize(34, 30)
@@ -1415,8 +1415,8 @@ class BrowserWidget(QWidget):
         self.reader_handle.hide()
         self.reader_handle.raise_()
 
-        # v1.3.10: the floating reader toolbar must not permanently cover the
-        # top of full-bleed comic pages. It auto-hides after brief inactivity
+        # The floating reader toolbar must not permanently cover the top of
+        # full-bleed comic pages. It auto-hides after brief inactivity
         # and returns when the pointer touches the top edge. This changes only
         # the Qt overlay; BatCave's reader DOM and comic image stay untouched.
         self._reader_nav_last_activity = time.monotonic()
@@ -1845,9 +1845,9 @@ class BrowserWidget(QWidget):
             self.apply_clean_view()
 
     def adjust_zoom(self, delta, emit=True):
-        # v0.7.9: persistent comic-only zoom.  Keep one stable baseline width
-        # per comic image and apply an absolute factor to that baseline.  This
-        # survives BatCave replacing/lazy-loading the page after a turn and
+        # Comic-only zoom uses one stable baseline width per image and applies
+        # an absolute factor to it. This survives BatCave replacing or
+        # lazy-loading the page after a turn and
         # avoids compounding errors from repeatedly scaling the current size.
         old_factor = self.zoom_factor
         new_factor = max(0.50, min(2.50, round(old_factor + delta, 2)))
@@ -1973,8 +1973,7 @@ class BrowserWidget(QWidget):
             self.zoomChanged.emit(self.web.url().toString(), self._current_title or self.web.title(), 1.0)
 
     def apply_clean_view(self):
-        # v0.7.9 SAFE CLEAN VIEW + MOUSE/KEYBOARD PAGE-TURN SHIELD
-        # Keep BatCave's reader DOM and lazy-loading layout intact. We only hide
+        # Keep BatCave's reader DOM and lazy-loading layout intact. Only hide
         # obvious site chrome here. Comic image sizing is changed ONLY when the
         # user explicitly presses +/- or Fit, which avoids blank/black pages
         # caused by repeatedly forcing dimensions while BatCave is lazy-loading.
@@ -2089,9 +2088,8 @@ class BrowserWidget(QWidget):
         if not is_allowed_batcave_url(url):
             return
 
-        # BatCave exposes the live page state directly in the reader's own
-        # SELECT control. The diagnostic report confirmed that this SELECT has
-        # one option per page and its selectedIndex tracks the active page.
+        # BatCave exposes live page state through a SELECT with one option per
+        # page; its selectedIndex tracks the active page.
         script = r"""
 (() => {
   const out={current:0,total:0,source:'none',finished:false};
@@ -2151,8 +2149,8 @@ class BrowserWidget(QWidget):
 
     def _issue_progress_result(self, url, title, result):
         # PySide/Qt WebEngine can return plain JS objects as None depending on
-        # the Chromium/PySide build. The tracker therefore returns JSON text,
-        # just like the working DBG diagnostic.
+        # the Chromium/PySide build, so the tracker returns JSON text for
+        # consistent deserialization.
         if isinstance(result, str):
             try:
                 result = json.loads(result)
@@ -2381,8 +2379,8 @@ class BrowserWidget(QWidget):
         self.web.page().runJavaScript(script, open_result)
 
     def _reader_handle_clicked(self):
-        # v1.3.14: BatCave can still change its own scroll position when the
-        # native reader controls regain focus/visibility. Snapshot the exact
+        # BatCave can change its own scroll position when the native reader
+        # controls regain focus/visibility. Snapshot the exact
         # page position before revealing the toolbar and restore it briefly
         # afterward. This does not touch the comic IMG or reader DOM.
         if not self.reading_mode:
@@ -2487,8 +2485,8 @@ class BrowserWidget(QWidget):
 
     def resizeEvent(self, event):
         super().resizeEvent(event)
-        # v1.3.13: controls are positioned inside the fixed native strip, not
-        # over the comic/webview.
+        # Position controls inside the fixed native strip, not over the
+        # comic/webview.
         self.reader_nav.adjustSize()
         self.reader_nav.move(8, 4)
         self.reader_nav.raise_()
@@ -2735,8 +2733,8 @@ class MainWindow(QMainWindow):
         self._fullscreen_sidebar_visible = True
         self._fullscreen_mini_sidebar_visible = False
         self._fullscreen_reader_mode = False
-        # Cover artwork is fetched only from BatCave over HTTPS and kept in
-        # memory. Paneleo never writes BatCave cover images to disk.
+        # Cover artwork is fetched only from BatCave over HTTPS. Full images
+        # stay in memory; only bounded, reduced JPEG thumbnails are persisted.
         self.cover_network = QNetworkAccessManager(self)
         self._cover_pixmaps = {}
         self._cover_waiters = {}
@@ -2763,8 +2761,8 @@ class MainWindow(QMainWindow):
         self.setMinimumSize(1040, 680)
         self.resize(1320, 860)
         self._build_ui()
-        # Beta 8.1: cover fetches reuse the existing embedded BatCave page.
-        # No second/offscreen WebEngine page is created, avoiding the transient
+        # Cover fetches reuse the existing embedded BatCave page. No
+        # second/offscreen WebEngine page is created, avoiding the transient
         # blank Paneleo window that could flash during background cover work.
         self._cover_web_page = None
         self.browser.web.loadFinished.connect(self._cover_browser_context_loaded)
@@ -3159,7 +3157,8 @@ class MainWindow(QMainWindow):
         self.browser.zoomChanged.connect(self.record_batcave_zoom)
         self.browser.readingListRequested.connect(lambda: self.show_page(self.READING_LIST))
         self.browser.bookmarkRequested.connect(self.toggle_current_bookmark)
-        # Cover discovery stays outside BrowserWidget so the reader core remains untouched.
+        # Keep cover discovery outside BrowserWidget to separate library
+        # artwork from reader navigation.
         self.browser.web.loadFinished.connect(self._capture_live_series_cover)
         self.pages.addWidget(self.browser)
 
@@ -3408,7 +3407,6 @@ class MainWindow(QMainWindow):
             self._set_reader_fullscreen_chrome(True)
 
     def apply_style(self):
-        # Paneleo Beta 8: production media-app visual system.
         # Keep reader/browser mechanics separate from presentation styling.
         self.setStyleSheet("""
             QMainWindow, QWidget {
@@ -3626,7 +3624,7 @@ class MainWindow(QMainWindow):
         return palettes[idx]
 
     def _prime_cover_metadata_from_library(self):
-        """Restore persisted BatCave poster/page URLs; image pixels remain memory-only."""
+        """Restore validated BatCave poster metadata for the thumbnail cache."""
         try:
             for section in ("issues", "saved"):
                 rows = self.batcave_library.get(section, {})
@@ -3846,8 +3844,8 @@ class MainWindow(QMainWindow):
                 seen.add(value)
                 candidates.append((score, value))
 
-        # Beta 7.3: BatCave series pages expose the canonical poster explicitly.
-        # The preload is the most reliable signal and appears before recommendation posters.
+        # BatCave series pages expose the canonical poster explicitly. The
+        # preload is the most reliable signal and precedes recommendation posters.
         for tag in re.findall(r'<link\b[^>]*>', html_text, flags=re.I | re.S):
             attrs = {}
             for am in re.finditer(r'([:\w-]+)\s*=\s*(["\'])(.*?)\2', tag, flags=re.I | re.S):
@@ -4269,7 +4267,7 @@ class MainWindow(QMainWindow):
             reply.deleteLater()
 
     def _request_series_cover(self, series_name, label):
-        # Beta 8.1: memory cache first, then a small local UI thumbnail cache.
+        # Check the memory cache first, then the bounded local thumbnail cache.
         # Missing covers are fetched inside the existing BatCave WebEngine page;
         # no second browser window/page is created.
         key = (series_name or "").strip().lower()
@@ -5484,8 +5482,8 @@ class MainWindow(QMainWindow):
             header_item.setData(Qt.ItemDataRole.UserRole + 1, series_name)
             header_item.setData(Qt.ItemDataRole.UserRole + 2, "series")
             header_item.setData(Qt.ItemDataRole.UserRole + 3, series_key)
-            # v1.3.9: remember whether this saved series actually has tracked
-            # issues. A single click on an empty series should open its BatCave
+            # Remember whether this saved series has tracked issues. A single
+            # click on an empty series should open its BatCave
             # page instead of toggling a dropdown that has nothing to show.
             header_item.setData(Qt.ItemDataRole.UserRole + 4, len(children))
             header_item.setToolTip(data.get("url", series_key))
@@ -5581,8 +5579,8 @@ class MainWindow(QMainWindow):
         if not item or item.data(Qt.ItemDataRole.UserRole + 2) != "series":
             return
 
-        # v1.3.9 UX fix: a saved series with no tracked/opened issues has no
-        # useful dropdown content. Open its BatCave series page on a normal
+        # A saved series with no tracked/opened issues has no useful dropdown
+        # content. Open its BatCave series page on a normal
         # click instead. Series that already have issue history keep the
         # existing click-to-expand/collapse behavior.
         try:
