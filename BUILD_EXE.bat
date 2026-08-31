@@ -1,0 +1,47 @@
+@echo off
+setlocal
+cd /d "%~dp0"
+title Paneleo 2.0 Beta - Build EXE
+
+set "VENV_PY=.venv\Scripts\python.exe"
+
+if not exist "%VENV_PY%" (
+    echo Run INSTALL.bat first.
+    pause
+    exit /b 1
+)
+
+"%VENV_PY%" -c "import sys; import PySide6; import pymupdf; raise SystemExit(0 if sys.prefix != sys.base_prefix else 1)" >nul 2>nul
+if errorlevel 1 (
+    echo Paneleo's .venv is invalid. Run RUN.bat to recreate it first.
+    pause
+    exit /b 1
+)
+
+rem Keep unrelated developer tools and their DLLs out of the packaged app.
+set "PATH=%~dp0.venv\Scripts;%SystemRoot%\System32;%SystemRoot%;%SystemRoot%\System32\Wbem;%SystemRoot%\System32\WindowsPowerShell\v1.0"
+set "PYTHONNOUSERSITE=1"
+
+"%VENV_PY%" -m pip install --only-binary=:all: pyinstaller==6.22.2
+if errorlevel 1 goto :fail
+
+rmdir /s /q build 2>nul
+rmdir /s /q dist 2>nul
+del /q Paneleo.spec 2>nul
+
+"%VENV_PY%" -m PyInstaller --noconfirm --clean --windowed --name Paneleo --collect-all PySide6.QtWebEngineCore --collect-all PySide6.QtWebEngineWidgets app.py
+if errorlevel 1 goto :fail
+
+echo.
+echo Build complete.
+echo Your app is in: dist\Paneleo\Paneleo.exe
+echo Keep the whole Paneleo folder together.
+echo.
+pause
+exit /b 0
+
+:fail
+echo.
+echo EXE build failed. Review the error above.
+pause
+exit /b 1

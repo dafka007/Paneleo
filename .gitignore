@@ -1,0 +1,69 @@
+# Python
+__pycache__/
+**/__pycache__/
+*.py[cod]
+*.pyo
+.venv/
+venv/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+*.egg-info/
+
+# Build output
+build/
+dist/
+*.spec
+
+# Runtime/debug files
+crash_log.txt
+reader_debug.json
+*.log
+*.tmp
+*.temp
+*.bak
+*.swp
+
+# Paneleo user data and browser/session state
+settings.json
+progress.json
+batcave_library.json
+cover_cache/
+.migration_v2_done
+browser_profile/
+webengine_profile/
+QtWebEngine/
+Cookies
+Cookies-journal
+Local Storage/
+Session Storage/
+
+# Local secrets and credentials
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.pfx
+*.p12
+
+# Editors / OS
+.vscode/
+.idea/
+.vs/
+*.suo
+*.user
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# Generated test and scratch output
+.tmp/
+tmp/
+.test-output/
+test-output/
+
+# User exports / backups
+*backup*.json

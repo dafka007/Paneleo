@@ -1,0 +1,45 @@
+Paneleo v2.0.0-beta8.4 — Fullscreen / Local Reader QA Report
+
+Automated/static checks: 26/26 passed
+
+PASS — Python AST parses
+PASS — BrowserWidget unchanged from 8.3
+PASS — Cover/cache methods unchanged
+PASS — F11 application shortcut retained
+PASS — Home fullscreen control present
+PASS — Local Library fullscreen control present
+PASS — Local reader fullscreen delegates to shared handler
+PASS — Local reader distraction-free chrome exists
+PASS — Reader top bar can hide
+PASS — Reader footer can hide
+PASS — Sidebar hides in local-reader fullscreen
+PASS — Pre-fullscreen maximized state saved
+PASS — Pre-fullscreen normal geometry saved
+PASS — Maximized state restored on exit
+PASS — Normal geometry restored on exit
+PASS — Fullscreen close preserves prior state
+PASS — Esc uses shared fullscreen exit
+PASS — Click-to-turn retained
+PASS — Page selector retained
+PASS — Fit-page re-render after fullscreen transition
+PASS — No shell=True
+PASS — No eval(
+PASS — No builtin exec()
+PASS — No extractall()
+PASS — No --no-sandbox
+PASS — Version updated
+
+Scope:
+- True app-wide fullscreen with F11.
+- Home and Local Library expose visible Fullscreen controls.
+- Local-reader fullscreen hides Paneleo navigation and reader chrome.
+- Exit restores prior maximized/windowed state and normal geometry.
+- Fit-page is recalculated after fullscreen transitions.
+
+Regression locks:
+- BrowserWidget unchanged from beta8.3.
+- Cover/cache methods unchanged from beta8.3.
+- Local click-to-turn and page selector retained.
+
+Runtime note:
+- Static/compile checks cannot reproduce the exact Windows window-manager transition in this Linux container; Windows GUI behavior requires the user smoke test.
