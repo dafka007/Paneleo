@@ -66,6 +66,11 @@ def test_keyboard_arrow_navigation(main_window, comic_files):
 def test_standalone_comic_remains_available_after_returning_home(
     main_window, paneleo_module, comic_files
 ):
+    long_path = comic_files.cbz.with_name(
+        "Absolute Wonder Woman 023 (2026) (Digital) (Shan-Empire).cbz"
+    )
+    comic_files.cbz.rename(long_path)
+    comic_files.cbz = long_path
     main_window.open_comic(str(comic_files.cbz))
     main_window.reader.next_page()
     QTest.qWait(60)
@@ -85,8 +90,11 @@ def test_standalone_comic_remains_available_after_returning_home(
     }
 
     main_window.show_page(paneleo_module.MainWindow.HOME)
+    QTest.qWait(80)
     assert main_window._home_primary_mode == "local"
     assert main_window.home_continue_title.text() == comic_files.cbz.stem
+    assert main_window.home_continue_title.height() >= 76
+    assert main_window.home_continue_title.height() >= main_window.home_continue_title.sizeHint().height()
 
     main_window.show_page(paneleo_module.MainWindow.LIBRARY)
     paths = {

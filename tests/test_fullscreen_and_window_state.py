@@ -1,4 +1,5 @@
 import json
+import time
 
 from PySide6.QtCore import Qt
 from PySide6.QtTest import QTest
@@ -11,7 +12,7 @@ def _assert_rect_close(actual, expected, tolerance=2):
     assert abs(actual.height() - expected.height()) <= tolerance
 
 
-def test_reader_fullscreen_hides_chrome_refits_and_restores_geometry(main_window, comic_files):
+def test_reader_fullscreen_uses_compact_controls_refits_and_restores_geometry(main_window, comic_files):
     main_window.open_comic(str(comic_files.cbz))
     main_window.showNormal()
     main_window.resize(1180, 760)
@@ -28,6 +29,8 @@ def test_reader_fullscreen_hides_chrome_refits_and_restores_geometry(main_window
     assert not main_window.mini_sidebar.isVisible()
     assert not main_window.reader.reader_bar.isVisible()
     assert not main_window.reader.reader_footer.isVisible()
+    assert main_window.reader.reader_control_strip.isVisible()
+    assert main_window.reader.fullscreen_nav.isVisible()
     fullscreen_pixmap = main_window.reader.image_label.pixmap()
     assert fullscreen_pixmap is not None and not fullscreen_pixmap.isNull()
     assert fullscreen_pixmap.width() > 0 and fullscreen_pixmap.height() > 0
@@ -38,6 +41,45 @@ def test_reader_fullscreen_hides_chrome_refits_and_restores_geometry(main_window
     assert main_window.reader.reader_bar.isVisible()
     assert main_window.reader.reader_footer.isVisible()
     _assert_rect_close(main_window.geometry(), expected_geometry)
+
+
+def test_local_fullscreen_controls_zoom_fit_and_reveal(main_window, comic_files):
+    main_window.open_comic(str(comic_files.cbz))
+    main_window.enter_window_fullscreen()
+    QTest.qWait(450)
+    reader = main_window.reader
+
+    assert reader.fullscreen_page.count() == 3
+    assert reader.fullscreen_zoom_out.isVisible()
+    assert reader.fullscreen_fit.isVisible()
+    assert reader.fullscreen_zoom_in.isVisible()
+    before = reader.image_label.pixmap().size()
+
+    QTest.mouseClick(reader.fullscreen_zoom_in, Qt.MouseButton.LeftButton)
+    QTest.qWait(100)
+    after = reader.image_label.pixmap().size()
+    assert reader.zoom_factor == 1.08
+    assert after.width() > before.width() or after.height() > before.height()
+    assert reader.fullscreen_fit.text() == "108%"
+    reader.zoom_factor = 2.42
+    reader.adjust_zoom(0.08)
+    assert reader.zoom_factor == 2.5
+    assert reader.fullscreen_fit.text() == "250%"
+    assert reader.fullscreen_fit.width() >= reader.fullscreen_fit.sizeHint().width()
+
+    QTest.mouseClick(reader.fullscreen_fit, Qt.MouseButton.LeftButton)
+    QTest.qWait(100)
+    assert reader.zoom_factor == 1.0
+    assert reader.fit_mode == "page"
+    assert reader.fullscreen_fit.text() == "Fit"
+
+    reader._fullscreen_nav_last_activity = time.monotonic() - 3.0
+    reader._update_fullscreen_nav_autohide()
+    assert not reader.fullscreen_nav.isVisible()
+    assert reader.fullscreen_handle.isVisible()
+    QTest.mouseClick(reader.fullscreen_handle, Qt.MouseButton.LeftButton)
+    assert reader.fullscreen_nav.isVisible()
+    assert not reader.fullscreen_handle.isVisible()
 
 
 def test_f11_toggles_fullscreen_and_escape_exits(main_window, comic_files):

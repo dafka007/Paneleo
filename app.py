@@ -654,9 +654,11 @@ class ReaderWidget(QWidget):
         self.pages = []
         self.page_index = 0
         self.fit_mode = "page"
+        self.zoom_factor = 1.0
         self.rtl = False
         self.pdf_doc = None
         self._page_selector_updating = False
+        self._fullscreen_controls_active = False
         self.setFocusPolicy(Qt.FocusPolicy.StrongFocus)
         self._build_ui()
 
@@ -719,6 +721,88 @@ class ReaderWidget(QWidget):
         bl.addWidget(self.fullscreen_btn)
         root.addWidget(bar)
 
+        # Match BatCave Reader Mode with a compact native control strip. The
+        # strip keeps a fixed height, so collapsing the toolbar never shifts
+        # the comic or changes the Fit Page viewport.
+        self.reader_control_strip = QFrame()
+        self.reader_control_strip.setObjectName("readerControlStrip")
+        self.reader_control_strip.setFixedHeight(52)
+        self.reader_control_strip.hide()
+        root.addWidget(self.reader_control_strip)
+
+        self.fullscreen_nav = QFrame(self.reader_control_strip)
+        self.fullscreen_nav.setObjectName("readerNav")
+        self.fullscreen_nav.setAttribute(Qt.WA_NoMousePropagation, True)
+        fn = QHBoxLayout(self.fullscreen_nav)
+        fn.setContentsMargins(5, 5, 5, 5)
+        fn.setSpacing(4)
+
+        self.fullscreen_back = QPushButton("←")
+        self.fullscreen_back.setToolTip("Back to Local Library")
+        self.fullscreen_prev = QPushButton("‹")
+        self.fullscreen_prev.setToolTip("Previous page")
+        self.fullscreen_page = QComboBox()
+        self.fullscreen_page.setObjectName("readerPageSelector")
+        self.fullscreen_page.setFixedHeight(36)
+        self.fullscreen_page.setMinimumWidth(118)
+        self.fullscreen_page.setToolTip("Current page — choose a page to jump")
+        self.fullscreen_page.addItem("Page 0 / 0", 0)
+        self.fullscreen_next = QPushButton("›")
+        self.fullscreen_next.setToolTip("Next page")
+        self.fullscreen_zoom_out = QPushButton("−")
+        self.fullscreen_zoom_out.setToolTip("Zoom out")
+        self.fullscreen_fit = QPushButton("Fit")
+        self.fullscreen_fit.setToolTip("Fit page / reset zoom")
+        self.fullscreen_zoom_in = QPushButton("+")
+        self.fullscreen_zoom_in.setToolTip("Zoom in")
+        self.fullscreen_exit = QPushButton("☰")
+        self.fullscreen_exit.setToolTip("Exit fullscreen (Esc)")
+
+        for button in (
+            self.fullscreen_back, self.fullscreen_prev, self.fullscreen_next,
+            self.fullscreen_zoom_out, self.fullscreen_fit,
+            self.fullscreen_zoom_in, self.fullscreen_exit,
+        ):
+            button.setObjectName("readerNavButton")
+            button.setFixedSize(40 if button is not self.fullscreen_fit else 64, 36)
+            button.setAttribute(Qt.WA_NoMousePropagation, True)
+            button.clicked.connect(self._show_fullscreen_controls)
+
+        self.fullscreen_back.clicked.connect(self.close_reader)
+        self.fullscreen_prev.clicked.connect(self.prev_page)
+        self.fullscreen_page.currentIndexChanged.connect(self.on_page_selected)
+        self.fullscreen_page.activated.connect(self._show_fullscreen_controls)
+        self.fullscreen_next.clicked.connect(self.next_page)
+        self.fullscreen_zoom_out.clicked.connect(lambda: self.adjust_zoom(-0.08))
+        self.fullscreen_fit.clicked.connect(self.fit_page)
+        self.fullscreen_zoom_in.clicked.connect(lambda: self.adjust_zoom(0.08))
+        self.fullscreen_exit.clicked.connect(self.toggle_fullscreen)
+
+        for control in (
+            self.fullscreen_back, self.fullscreen_prev, self.fullscreen_page,
+            self.fullscreen_next, self.fullscreen_zoom_out,
+            self.fullscreen_fit, self.fullscreen_zoom_in, self.fullscreen_exit,
+        ):
+            fn.addWidget(control)
+
+        self.fullscreen_nav.adjustSize()
+        self.fullscreen_nav.hide()
+        self.fullscreen_nav.raise_()
+
+        self.fullscreen_handle = QPushButton("☰", self.reader_control_strip)
+        self.fullscreen_handle.setObjectName("readerHandle")
+        self.fullscreen_handle.setFixedSize(34, 30)
+        self.fullscreen_handle.setToolTip("Show reader controls")
+        self.fullscreen_handle.clicked.connect(self._show_fullscreen_controls)
+        self.fullscreen_handle.hide()
+        self.fullscreen_handle.raise_()
+
+        self._fullscreen_nav_last_activity = time.monotonic()
+        self._fullscreen_nav_autohide = QTimer(self)
+        self._fullscreen_nav_autohide.setInterval(150)
+        self._fullscreen_nav_autohide.timeout.connect(self._update_fullscreen_nav_autohide)
+        self._fullscreen_nav_autohide.start()
+
         self.scroll = QScrollArea()
         self.scroll.setWidgetResizable(True)
         self.scroll.setAlignment(Qt.AlignmentFlag.AlignCenter)
@@ -763,12 +847,20 @@ class ReaderWidget(QWidget):
             w.showFullScreen()
 
     def set_distraction_free(self, on):
-        """Hide local-reader chrome while the main window is fullscreen."""
+        """Use BatCave-style compact controls while the shell is fullscreen."""
         on = bool(on)
+        self._fullscreen_controls_active = on
         if hasattr(self, "reader_bar"):
             self.reader_bar.setVisible(not on)
         if hasattr(self, "reader_footer"):
             self.reader_footer.setVisible(not on)
+        if hasattr(self, "reader_control_strip"):
+            self.reader_control_strip.setVisible(on)
+        if on:
+            self._show_fullscreen_controls()
+        else:
+            self.fullscreen_nav.hide()
+            self.fullscreen_handle.hide()
         if hasattr(self, "fullscreen_btn"):
             self.fullscreen_btn.setText("Exit fullscreen" if on else "Fullscreen")
         # Re-fit the current page after the fullscreen/window layout has settled.
@@ -776,6 +868,53 @@ class ReaderWidget(QWidget):
             QTimer.singleShot(0, self.render_page)
         if on:
             self.setFocus(Qt.FocusReason.OtherFocusReason)
+
+    def _show_fullscreen_controls(self, *_):
+        if not self._fullscreen_controls_active:
+            return
+        self._fullscreen_nav_last_activity = time.monotonic()
+        self.fullscreen_nav.adjustSize()
+        self.fullscreen_nav.move(8, 4)
+        self.fullscreen_handle.move(8, 9)
+        self.fullscreen_handle.hide()
+        self.fullscreen_nav.show()
+        self.fullscreen_nav.raise_()
+
+    def _update_fullscreen_nav_autohide(self):
+        if not self._fullscreen_controls_active or not self.fullscreen_nav.isVisible():
+            return
+        now = time.monotonic()
+        if self.fullscreen_nav.underMouse():
+            self._fullscreen_nav_last_activity = now
+            return
+        if now - self._fullscreen_nav_last_activity >= 2.4:
+            self.fullscreen_nav.hide()
+            self.fullscreen_handle.show()
+            self.fullscreen_handle.raise_()
+
+    def adjust_zoom(self, delta):
+        new_factor = max(0.50, min(2.50, round(self.zoom_factor + delta, 2)))
+        if new_factor == self.zoom_factor:
+            return
+        self.zoom_factor = new_factor
+        self.fullscreen_fit.setText(f"{int(self.zoom_factor * 100)}%")
+        self.fullscreen_fit.setToolTip("Fit page / reset zoom")
+        self.render_page()
+        self.setFocus(Qt.FocusReason.OtherFocusReason)
+
+    def reset_zoom(self):
+        self.zoom_factor = 1.0
+        self.fullscreen_fit.setText("Fit")
+        self.render_page()
+        self.setFocus(Qt.FocusReason.OtherFocusReason)
+
+    def fit_page(self):
+        self.fit_mode = "page"
+        if self.mode.currentIndex() != 0:
+            self.mode.blockSignals(True)
+            self.mode.setCurrentIndex(0)
+            self.mode.blockSignals(False)
+        self.reset_zoom()
 
     def set_manga(self, on):
         self.rtl = on
@@ -796,25 +935,33 @@ class ReaderWidget(QWidget):
         total = len(self.pages)
         self._page_selector_updating = True
         try:
-            if total <= 0:
-                self.page_selector.clear()
-                self.page_selector.addItem("Page 0 / 0", 0)
-                self.page_selector.setEnabled(False)
-                return
-            if self.page_selector.count() != total:
-                self.page_selector.clear()
-                for n in range(1, total + 1):
-                    self.page_selector.addItem(f"Page {n} / {total}", n)
-            self.page_selector.setEnabled(True)
-            self.page_selector.setCurrentIndex(max(0, min(self.page_index, total - 1)))
-            self.page_selector.setToolTip(f"Page {self.page_index + 1} of {total} — select a page to jump")
+            for selector in (self.page_selector, self.fullscreen_page):
+                selector.blockSignals(True)
+                if total <= 0:
+                    selector.clear()
+                    selector.addItem("Page 0 / 0", 0)
+                    selector.setEnabled(False)
+                else:
+                    if selector.count() != total:
+                        selector.clear()
+                        for n in range(1, total + 1):
+                            selector.addItem(f"Page {n} / {total}", n)
+                    selector.setEnabled(True)
+                    selector.setCurrentIndex(max(0, min(self.page_index, total - 1)))
+                    selector.setToolTip(
+                        f"Page {self.page_index + 1} of {total} — select a page to jump"
+                    )
+                selector.blockSignals(False)
         finally:
             self._page_selector_updating = False
 
     def on_page_selected(self, index):
         if self._page_selector_updating or not self.pages or index < 0:
             return
-        value = self.page_selector.itemData(index)
+        selector = self.sender()
+        if not isinstance(selector, QComboBox):
+            selector = self.page_selector
+        value = selector.itemData(index)
         try:
             page_number = int(value)
         except Exception:
@@ -832,6 +979,8 @@ class ReaderWidget(QWidget):
     def open_file(self, file_path):
         self.cleanup()
         self.current_file = str(file_path)
+        self.zoom_factor = 1.0
+        self.fullscreen_fit.setText("Fit")
         self.title.setText(Path(file_path).stem)
         self.temp_dir = Path(tempfile.mkdtemp(prefix="comic_reader_"))
         ext = Path(file_path).suffix.lower()
@@ -896,6 +1045,15 @@ class ReaderWidget(QWidget):
                 target, Qt.AspectRatioMode.KeepAspectRatio, Qt.TransformationMode.SmoothTransformation
             )
 
+        if self.zoom_factor != 1.0 and not pix.isNull():
+            zoomed = QSize(
+                max(1, round(pix.width() * self.zoom_factor)),
+                max(1, round(pix.height() * self.zoom_factor)),
+            )
+            pix = QPixmap.fromImage(img).scaled(
+                zoomed, Qt.AspectRatioMode.KeepAspectRatio, Qt.TransformationMode.SmoothTransformation
+            )
+
         self.image_label.setPixmap(pix)
         self.image_label.resize(pix.size())
         self.page_label.setText(f"{self.page_index + 1} / {len(self.pages)}")
@@ -908,6 +1066,8 @@ class ReaderWidget(QWidget):
         self.next_btn.setEnabled(can_next)
         self.top_prev_btn.setEnabled(can_prev)
         self.top_next_btn.setEnabled(can_next)
+        self.fullscreen_prev.setEnabled(can_prev)
+        self.fullscreen_next.setEnabled(can_next)
         if self.current_file:
             self.progress_store[self.current_file] = self.page_index
             save_json(PROGRESS_FILE, self.progress_store)
@@ -916,6 +1076,13 @@ class ReaderWidget(QWidget):
 
     def resizeEvent(self, event):
         super().resizeEvent(event)
+        if hasattr(self, "fullscreen_nav"):
+            self.fullscreen_nav.adjustSize()
+            self.fullscreen_nav.move(8, 4)
+            self.fullscreen_nav.raise_()
+        if hasattr(self, "fullscreen_handle"):
+            self.fullscreen_handle.move(8, 9)
+            self.fullscreen_handle.raise_()
         if self.fit_mode in ("page", "width"):
             self.render_page()
 
@@ -940,7 +1107,15 @@ class ReaderWidget(QWidget):
             self.setFocus(Qt.FocusReason.OtherFocusReason)
 
     def keyPressEvent(self, event):
-        if event.key() in (Qt.Key.Key_Right, Qt.Key.Key_Space, Qt.Key.Key_PageDown):
+        if event.modifiers() & Qt.KeyboardModifier.ControlModifier and event.key() in (
+            Qt.Key.Key_Plus, Qt.Key.Key_Equal
+        ):
+            self.adjust_zoom(0.08)
+        elif event.modifiers() & Qt.KeyboardModifier.ControlModifier and event.key() == Qt.Key.Key_Minus:
+            self.adjust_zoom(-0.08)
+        elif event.modifiers() & Qt.KeyboardModifier.ControlModifier and event.key() == Qt.Key.Key_0:
+            self.fit_page()
+        elif event.key() in (Qt.Key.Key_Right, Qt.Key.Key_Space, Qt.Key.Key_PageDown):
             self.next_page()
         elif event.key() in (Qt.Key.Key_Left, Qt.Key.Key_PageUp):
             self.prev_page()
@@ -2774,6 +2949,10 @@ class MainWindow(QMainWindow):
         self.home_continue_title = QLabel("Nothing in progress yet")
         self.home_continue_title.setTextFormat(Qt.TextFormat.PlainText)
         self.home_continue_title.setWordWrap(True)
+        self.home_continue_title.setMinimumHeight(76)
+        self.home_continue_title.setSizePolicy(
+            QSizePolicy.Policy.Expanding, QSizePolicy.Policy.MinimumExpanding
+        )
         self.home_continue_title.setObjectName("heroTitle")
         self.home_continue_meta = QLabel("Open BatCave or a local comic to get started.")
         self.home_continue_meta.setTextFormat(Qt.TextFormat.PlainText)
@@ -4776,7 +4955,7 @@ class MainWindow(QMainWindow):
             self.reader.fullscreen_btn.setText(label)
 
     def _set_reader_fullscreen_chrome(self, on):
-        """Use true distraction-free fullscreen only for the local reader."""
+        """Hide the app shell but retain local-reader controls in fullscreen."""
         reader_mode = bool(on and self.pages.currentIndex() == self.READER)
         self._fullscreen_reader_mode = reader_mode
         if hasattr(self, "reader"):
