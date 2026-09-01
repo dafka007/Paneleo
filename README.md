@@ -13,6 +13,16 @@ Go to the [Releases page](https://github.com/dafka007/Paneleo/releases) and choo
 
 Python is not required for either build. CBR/RAR files need [7-Zip](https://www.7-zip.org/) installed separately. The builds are currently unsigned, so Windows SmartScreen may show an **Unknown Publisher** warning.
 
+## Screenshots
+
+### Local library
+
+![Paneleo local library with sample comics](docs/images/paneleo-library.png)
+
+### Local reader
+
+![Paneleo local comic reader showing a sample comic](docs/images/paneleo-reader.png)
+
 ## Features
 
 - Open CBZ, CBR, and PDF comics or scan a folder into the local library.
