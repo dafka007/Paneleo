@@ -1,6 +1,6 @@
 @echo off
 setlocal EnableExtensions
-cd /d "%~dp0"
+cd /d "%~dp0.."
 title Paneleo Windows Distribution Build
 
 set "VENV_PY=.venv\Scripts\python.exe"
@@ -9,13 +9,13 @@ set "APP_VERSION_NUMERIC="
 set "ISCC="
 
 if not exist "%VENV_PY%" (
-    echo Paneleo's build environment is missing. Run RUN.bat first.
+    echo Paneleo's build environment is missing. See docs\BUILDING.md.
     goto :fail
 )
 
 "%VENV_PY%" -c "import sys; import PySide6; import pymupdf; raise SystemExit(0 if sys.prefix != sys.base_prefix else 1)" >nul 2>nul
 if errorlevel 1 (
-    echo Paneleo's .venv is invalid. Run RUN.bat to recreate it first.
+    echo Paneleo's .venv is invalid. Recreate it as described in docs\BUILDING.md.
     goto :fail
 )
 
@@ -24,7 +24,7 @@ for /f "delims=" %%V in ('"%VENV_PY%" packaging\prepare_windows_assets.py --app 
 if not defined APP_VERSION goto :fail
 if not defined APP_VERSION_NUMERIC goto :fail
 
-call BUILD_EXE.bat --no-pause
+call scripts\BUILD_EXE.bat --no-pause
 if errorlevel 1 goto :fail
 
 if exist "release" rmdir /s /q "release"

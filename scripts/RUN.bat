@@ -1,6 +1,6 @@
 @echo off
 setlocal
-cd /d "%~dp0"
+cd /d "%~dp0.."
 title Paneleo 0.1.0-beta.1
 
 set "VENV_PY=.venv\Scripts\python.exe"
@@ -23,7 +23,7 @@ if "%VENV_OK%"=="0" (
         echo Could not remove the invalid .venv. Close Paneleo and try again.
         goto :fail
     )
-    call INSTALL.bat
+    call scripts\INSTALL.bat
     if errorlevel 1 goto :fail
 )
 
@@ -33,7 +33,7 @@ if not exist "%VENV_PYW%" goto :fail
 if errorlevel 1 goto :fail
 
 if exist crash_log.txt del /q crash_log.txt >nul 2>nul
-start "Paneleo" /D "%~dp0" "%VENV_PYW%" "%~dp0START.pyw"
+start "Paneleo" /D "%CD%" "%VENV_PYW%" "%CD%\START.pyw"
 exit /b 0
 
 :fail

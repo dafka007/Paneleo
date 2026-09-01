@@ -1,111 +1,42 @@
 # Paneleo
 
-Paneleo is a Windows desktop comic reader that combines a local comic library with an embedded BatCave browsing and reading experience. The current version is the first public beta: `0.1.0-beta.1`.
+Paneleo is a Windows comic reader I made because I wanted one place for my local comics and BatCave.
 
-## Main features
+This is the first public beta. It reads CBZ, CBR, and PDF files, keeps track of where you stopped, and includes an embedded BatCave reader.
 
-- Open individual comics or scan a folder into the local library.
-- Resume standalone local comics from the home screen with saved page progress.
-- Read CBZ, CBR, and PDF files.
-- Browse BatCave in an embedded browser and track recent issues, reading-list entries, bookmarks, and reading progress.
-- Navigate with on-screen controls, page clicks, or the keyboard.
-- Use Fit Page, Fit Width, Actual Size, and adjustable zoom.
-- Enter a distraction-free fullscreen reader while retaining compact reader controls.
-- Restore the previous window size, position, or maximized state after fullscreen.
+## Download
 
-## Local comic reader
+Go to the [Releases page](https://github.com/dafka007/Paneleo/releases) and choose one of these:
 
-Choose **Open comic** for a single file or **Choose folder** to build a searchable local library. Paneleo records local reading progress and generates bounded cover thumbnails without modifying the original comic files.
+- **Installer:** download `Paneleo-Setup-0.1.0-beta.1.exe` for a normal Windows installation. It installs to Program Files and asks for administrator permission.
+- **Portable:** download `Paneleo-Portable-0.1.0-beta.1.zip`, extract it, open the `Paneleo` folder, and run `Paneleo.exe`. It does not need installation or administrator permission.
 
-Supported formats:
+Python is not required for either build. CBR/RAR files need [7-Zip](https://www.7-zip.org/) installed separately. The builds are currently unsigned, so Windows SmartScreen may show an **Unknown Publisher** warning.
 
-- CBZ (ZIP-based comic archives)
-- CBR (RAR-based comic archives; requires 7-Zip)
-- PDF
+## Features
 
-## BatCave integration
+- Open CBZ, CBR, and PDF comics or scan a folder into the local library.
+- Resume local comics with saved page progress and cover art.
+- Browse and read BatCave comics inside Paneleo.
+- Keep BatCave reading progress, bookmarks, recent issues, and reading-list entries.
+- Turn pages by clicking, using the keyboard, or using the on-screen controls.
+- Zoom, Fit Page, Fit Width, use manga direction, and read fullscreen.
 
-Paneleo includes an embedded BatCave browser and reader. It can retain reading-list entries, recent issues, bookmarks, issue progress, and bounded cover thumbnails. Live website behavior depends on BatCave and is intentionally excluded from the offline regression suite.
+## Beta notes
 
-## Reader controls
-
-Use the previous/next buttons, click the left or right side of a page, or use the arrow keys to turn pages. The reader also supports page selection, manga direction, Fit Page, Fit Width, Actual Size, and zoom from 50% to 250%.
-
-Press `F11` to enter or leave fullscreen and `Esc` to leave it. In local-reader fullscreen, the Windows title bar, Paneleo sidebar, and standard reader chrome are hidden. A compact control strip provides page navigation, zoom, fit-page, back, and fullscreen-exit controls; it collapses automatically to keep the comic unobstructed. Fit Page recalculates for the fullscreen viewport.
-
-## Requirements
-
-- Windows x64
-- 64-bit Python 3.10 through 3.14 (Python 3.12 recommended)
-- Microsoft Visual C++ 2015-2022 Redistributable (x64) for packaged builds
-- 7-Zip for CBR/RAR archive extraction
-
-Install 7-Zip from [7-zip.org](https://www.7-zip.org/) if you need CBR support. CBZ and PDF support do not require it.
-
-The Windows installer checks for the supported Microsoft Visual C++ x64 runtime and links to Microsoft's official download if it is missing. Paneleo does not bundle Microsoft runtime DLLs.
-
-## Windows distributions
-
-The Windows installer installs Paneleo for all users under `C:\Program Files\Paneleo`, creates a Start Menu shortcut, and can optionally create a desktop shortcut. Installation, updates, and uninstalling require administrator permission. Python is not installed or required. Paneleo data remains separate for each Windows user in `%APPDATA%\Paneleo`, and uninstalling the application leaves that user data in place.
-
-The portable ZIP is the no-install, no-admin option. Extract it, open the self-contained `Paneleo` folder, and run `Paneleo.exe`; Python and development tools are not required. Portable builds use the same `%APPDATA%\Paneleo` data location as installed builds.
-
-7-Zip is not bundled with either distribution. Paneleo runs normally without it, but opening CBR/RAR-based comics requires a separate 7-Zip installation.
-
-Current Windows binaries are unsigned, so Windows SmartScreen may show an **Unknown Publisher** warning.
-
-## Run from source
-
-1. Install a supported 64-bit Python from [python.org](https://www.python.org/downloads/windows/) and enable **Add python.exe to PATH** during installation.
-2. Run `INSTALL.bat` once to create `.venv` and install the pinned runtime dependencies.
-3. Run `RUN.bat` to start Paneleo.
-
-`RUN.bat` validates that the virtual environment and core dependencies actually execute. If `.venv` is missing or invalid, it safely recreates the generated environment through `INSTALL.bat`.
+- Paneleo currently supports 64-bit Windows.
+- BatCave support depends on the website and may need updates when the site changes.
+- Paneleo data is stored per Windows user in `%APPDATA%\Paneleo`. Uninstalling the app leaves that data in place.
+- Back up anything important and report reproducible problems through [GitHub Issues](https://github.com/dafka007/Paneleo/issues).
 
 ## Development
 
-The application uses Python, PySide6/Qt WebEngine, and PyMuPDF. Runtime dependencies are pinned in `requirements-win64.txt`; test dependencies are listed in `requirements-dev.txt`.
+Paneleo uses Python, PySide6/Qt WebEngine, and PyMuPDF. See [docs/BUILDING.md](docs/BUILDING.md) for source setup, testing, and Windows build instructions.
 
-After running `INSTALL.bat`, install the test dependency with:
+## License and source
 
-```bat
-.venv\Scripts\python.exe -m pip install -r requirements-dev.txt
-```
+Paneleo-owned code is licensed under [AGPL-3.0-only](LICENSE). Third-party components keep their own licenses; see [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
 
-Run the complete offline regression suite with:
-
-```bat
-TEST.bat
-```
-
-The suite uses temporary data and does not read or modify normal Paneleo user data.
-
-## Build the executable
-
-Run:
-
-```bat
-BUILD_EXE.bat
-```
-
-The script installs the pinned PyInstaller version, creates a clean Windows build, and writes the packaged application to `dist\Paneleo\Paneleo.exe`. Keep the complete `dist\Paneleo` folder together.
-
-To create both Windows release formats, install [Inno Setup 7](https://jrsoftware.org/isdl.php) and run:
-
-```bat
-BUILD_RELEASE.bat
-```
-
-The installer, portable ZIP, and corresponding-source ZIP are written to `release\`. Generated release artifacts are intentionally excluded from source control.
-
-## Beta status
-
-Paneleo `0.1.0-beta.1` is the first public beta. Back up important reading-list and bookmark data, and report reproducible issues with the file format and steps that triggered them.
-
-## License
-
-Paneleo-owned code is licensed under the [GNU Affero General Public License v3.0 only](LICENSE). Third-party components remain under their own licenses; see [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
-
-Each binary release includes a corresponding-source archive containing Paneleo's exact source and the source for bundled copyleft components. See [CORRESPONDING_SOURCE.md](CORRESPONDING_SOURCE.md).
+Each binary release includes a corresponding-source archive with the exact Paneleo source and the source for bundled copyleft components. See [CORRESPONDING_SOURCE.md](CORRESPONDING_SOURCE.md).
 
 Copyright (C) 2026 dafka007

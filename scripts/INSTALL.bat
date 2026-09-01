@@ -1,6 +1,6 @@
 @echo off
 setlocal
-cd /d "%~dp0"
+cd /d "%~dp0.."
 title Paneleo 0.1.0-beta.1 - Installer
 
 echo ========================================
@@ -53,7 +53,7 @@ if errorlevel 1 goto :fail
 echo.
 echo ========================================
 echo Installation complete.
-echo Double-click RUN.bat to start Paneleo.
+echo Development environment ready. See docs\BUILDING.md for commands.
 echo ========================================
 echo.
 echo NOTE: CBR files require 7-Zip.
@@ -64,6 +64,6 @@ exit /b 0
 
 :fail
 echo.
-echo Installation failed. Use RUN_DEBUG.bat for details.
+echo Environment setup failed. Review the error above.
 pause
 exit /b 1

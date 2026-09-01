@@ -103,8 +103,8 @@ def test_cover_caches_remain_bounded():
 
 
 def test_launch_and_build_scripts_validate_the_project_environment():
-    run_script = (PROJECT_ROOT / "RUN.bat").read_text(encoding="utf-8")
-    build_script = (PROJECT_ROOT / "BUILD_EXE.bat").read_text(encoding="utf-8")
+    run_script = (PROJECT_ROOT / "scripts" / "RUN.bat").read_text(encoding="utf-8")
+    build_script = (PROJECT_ROOT / "scripts" / "BUILD_EXE.bat").read_text(encoding="utf-8")
     for script in (run_script, build_script):
         assert "import PySide6; import pymupdf" in script
         assert "sys.prefix != sys.base_prefix" in script

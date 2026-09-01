@@ -38,7 +38,7 @@ def test_packaging_copies_notices_and_omits_microsoft_runtime_dlls(tmp_path):
 
 
 def test_release_builder_creates_all_three_release_assets():
-    script = (PROJECT_ROOT / "BUILD_RELEASE.bat").read_text(encoding="utf-8")
+    script = (PROJECT_ROOT / "scripts" / "BUILD_RELEASE.bat").read_text(encoding="utf-8")
     assert "Paneleo-Setup-%APP_VERSION%.exe" in script
     assert "Paneleo-Portable-%APP_VERSION%.zip" in script
     assert "Paneleo-Corresponding-Source-%APP_VERSION%.zip" in script

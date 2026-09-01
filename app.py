@@ -992,7 +992,7 @@ class ReaderWidget(QWidget):
                 self.pages = extract_cbr_safely(file_path, self.temp_dir)
             elif ext == ".pdf":
                 if fitz is None:
-                    raise RuntimeError("PDF support is unavailable. Run INSTALL.bat again.")
+                    raise RuntimeError("PDF support is unavailable. Reinstall Paneleo and try again.")
                 if Path(file_path).stat().st_size > MAX_PDF_FILE_BYTES:
                     raise RuntimeError("This PDF is larger than the safe file-size limit.")
                 self.pdf_doc = fitz.open(file_path)

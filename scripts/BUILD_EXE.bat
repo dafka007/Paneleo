@@ -1,19 +1,19 @@
 @echo off
 setlocal
-cd /d "%~dp0"
+cd /d "%~dp0.."
 title Paneleo 0.1.0-beta.1 - Build EXE
 
 set "VENV_PY=.venv\Scripts\python.exe"
 
 if not exist "%VENV_PY%" (
-    echo Run INSTALL.bat first.
+    echo Create the environment described in docs\BUILDING.md first.
     pause
     exit /b 1
 )
 
 "%VENV_PY%" -c "import sys; import PySide6; import pymupdf; raise SystemExit(0 if sys.prefix != sys.base_prefix else 1)" >nul 2>nul
 if errorlevel 1 (
-    echo Paneleo's .venv is invalid. Run RUN.bat to recreate it first.
+    echo Paneleo's .venv is invalid. Recreate it as described in docs\BUILDING.md.
     pause
     exit /b 1
 )

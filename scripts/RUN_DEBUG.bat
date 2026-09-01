@@ -1,11 +1,11 @@
 @echo off
-cd /d "%~dp0"
+cd /d "%~dp0.."
 title Paneleo 0.1.0-beta.1 - Debug
 
 if not exist ".venv\Scripts\python.exe" (
     echo Paneleo is not installed yet.
     echo Running installer first...
-    call INSTALL.bat
+    call scripts\INSTALL.bat
     if errorlevel 1 goto :fail
 )
 

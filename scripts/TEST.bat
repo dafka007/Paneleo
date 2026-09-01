@@ -1,6 +1,6 @@
 @echo off
 setlocal
-cd /d "%~dp0"
+cd /d "%~dp0.."
 title Paneleo Regression Tests
 
 set "VENV_PY=.venv\Scripts\python.exe"
@@ -27,12 +27,12 @@ exit /b 0
 
 :missing
 echo Paneleo's .venv is missing.
-echo Run RUN.bat first, then install the test dependency with:
+echo Create the environment as described in docs\BUILDING.md, then run:
 echo .venv\Scripts\python.exe -m pip install -r requirements-dev.txt
 exit /b 1
 
 :broken
 echo Paneleo's test environment is missing, broken, or incomplete.
-echo Run RUN.bat first, then install the test dependency with:
+echo Create the environment as described in docs\BUILDING.md, then run:
 echo .venv\Scripts\python.exe -m pip install -r requirements-dev.txt
 exit /b 1
