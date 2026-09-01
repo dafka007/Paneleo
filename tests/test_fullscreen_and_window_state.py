@@ -12,11 +12,36 @@ def _assert_rect_close(actual, expected, tolerance=2):
     assert abs(actual.height() - expected.height()) <= tolerance
 
 
+def _set_windowed_test_geometry(window, width, height, x, y):
+    """Choose a stable window geometry that fits the current test desktop."""
+
+    available = window.screen().availableGeometry()
+    frame = window.frameGeometry()
+    client = window.geometry()
+    frame_width = max(0, frame.width() - client.width())
+    frame_height = max(0, frame.height() - client.height())
+
+    width = min(width, max(window.minimumWidth(), available.width() - frame_width))
+    height = min(height, max(window.minimumHeight(), available.height() - frame_height))
+
+    if width + frame_width >= available.width():
+        x = available.x()
+    else:
+        x = min(max(x, available.x()), available.right() - width - frame_width + 1)
+
+    if height + frame_height >= available.height():
+        y = available.y()
+    else:
+        y = min(max(y, available.y()), available.bottom() - height - frame_height + 1)
+
+    window.resize(width, height)
+    window.move(x, y)
+
+
 def test_reader_fullscreen_uses_compact_controls_refits_and_restores_geometry(main_window, comic_files):
     main_window.open_comic(str(comic_files.cbz))
     main_window.showNormal()
-    main_window.resize(1180, 760)
-    main_window.move(120, 90)
+    _set_windowed_test_geometry(main_window, 1180, 760, 120, 90)
     QTest.qWait(180)
     expected_geometry = main_window.geometry()
     before = main_window.reader.image_label.pixmap()
@@ -112,8 +137,7 @@ def test_closing_fullscreen_preserves_previous_windowed_state(
     window.show()
     window.open_comic(str(comic_files.cbz))
     window.showNormal()
-    window.resize(1120, 740)
-    window.move(140, 100)
+    _set_windowed_test_geometry(window, 1120, 740, 140, 100)
     QTest.qWait(200)
     expected_geometry = window.geometry()
     window.enter_window_fullscreen()
