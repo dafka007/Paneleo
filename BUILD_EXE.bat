@@ -27,9 +27,13 @@ if errorlevel 1 goto :fail
 
 rmdir /s /q build 2>nul
 rmdir /s /q dist 2>nul
+rmdir /s /q packaging\generated 2>nul
 del /q Paneleo.spec 2>nul
 
-"%VENV_PY%" -m PyInstaller --noconfirm --clean --windowed --name Paneleo --collect-all PySide6.QtWebEngineCore --collect-all PySide6.QtWebEngineWidgets app.py
+"%VENV_PY%" packaging\prepare_windows_assets.py --app app.py --output-dir packaging\generated
+if errorlevel 1 goto :fail
+
+"%VENV_PY%" -m PyInstaller --noconfirm --clean --windowed --name Paneleo --icon packaging\generated\Paneleo.ico --version-file packaging\generated\Paneleo-version.txt --collect-all PySide6.QtWebEngineCore --collect-all PySide6.QtWebEngineWidgets app.py
 if errorlevel 1 goto :fail
 
 echo.
@@ -37,11 +41,13 @@ echo Build complete.
 echo Your app is in: dist\Paneleo\Paneleo.exe
 echo Keep the whole Paneleo folder together.
 echo.
+if /I "%~1"=="--no-pause" exit /b 0
 pause
 exit /b 0
 
 :fail
 echo.
 echo EXE build failed. Review the error above.
+if /I "%~1"=="--no-pause" exit /b 1
 pause
 exit /b 1

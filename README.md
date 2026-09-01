@@ -41,6 +41,14 @@ Press `F11` to enter or leave fullscreen and `Esc` to leave it. In local-reader 
 
 Install 7-Zip from [7-zip.org](https://www.7-zip.org/) if you need CBR support. CBZ and PDF support do not require it.
 
+## Windows distributions
+
+The Windows installer installs Paneleo for the current user, creates a Start Menu shortcut, and can optionally create a desktop shortcut. It does not require administrator privileges or install Python. Upgrades retain Paneleo data in `%APPDATA%\Paneleo`, and uninstalling the application leaves that user data in place.
+
+The portable ZIP contains a self-contained `Paneleo` folder. Extract it, open the folder, and run `Paneleo.exe`; Python and development tools are not required. Portable builds use the same `%APPDATA%\Paneleo` data location as installed builds.
+
+7-Zip is not bundled with either distribution. Paneleo runs normally without it, but opening CBR/RAR-based comics requires a separate 7-Zip installation.
+
 ## Run from source
 
 1. Install a supported 64-bit Python from [python.org](https://www.python.org/downloads/windows/) and enable **Add python.exe to PATH** during installation.
@@ -76,6 +84,14 @@ BUILD_EXE.bat
 ```
 
 The script installs the pinned PyInstaller version, creates a clean Windows build, and writes the packaged application to `dist\Paneleo\Paneleo.exe`. Keep the complete `dist\Paneleo` folder together.
+
+To create both Windows release formats, install [Inno Setup 7](https://jrsoftware.org/isdl.php) and run:
+
+```bat
+BUILD_RELEASE.bat
+```
+
+The installer and portable ZIP are written to `release\`. Generated release artifacts are intentionally excluded from source control.
 
 ## Beta status
 
