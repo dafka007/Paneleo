@@ -11,6 +11,6 @@ This directory accompanies Paneleo's source, installer, and portable build.
 - `OpenSSL-3.0.16.txt`: exact license text from OpenSSL 3.0.16.
 - `PyInstaller-6.22.2.txt`: exact PyInstaller license and bootloader exception from the installed package.
 - `Inno-Setup-7.1.0.txt`: exact Inno Setup license notice.
-- `Qt-WebEngine-6.11.2-Third-Party-Components.html` and `qtwebengine/`: offline copies of Qt's index and 126 component-by-component Qt WebEngine/Chromium copyright and license notice pages for Qt 6.11.2.
+- `Qt-WebEngine-6.11.2-Third-Party-Components.html` and `qt-webengine-notices/`: offline copies of Qt's index and 126 component-by-component Qt WebEngine/Chromium copyright and license notice pages for Qt 6.11.2.
 
 See `THIRD_PARTY_NOTICES.md` for versions, copyright summaries, and how each component is used.
