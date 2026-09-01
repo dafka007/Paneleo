@@ -42,3 +42,11 @@ def test_release_builder_creates_all_three_release_assets():
     assert "Paneleo-Setup-%APP_VERSION%.exe" in script
     assert "Paneleo-Portable-%APP_VERSION%.zip" in script
     assert "Paneleo-Corresponding-Source-%APP_VERSION%.zip" in script
+
+
+def test_installer_removes_obsolete_local_microsoft_runtimes():
+    script = (PROJECT_ROOT / "packaging" / "Paneleo.iss").read_text(encoding="utf-8")
+    assert "[InstallDelete]" in script
+    assert "VCRUNTIME140*.dll" in script
+    assert "MSVCP140*.dll" in script
+    assert "CONCRT140.dll" in script

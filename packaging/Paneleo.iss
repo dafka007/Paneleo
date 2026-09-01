@@ -43,6 +43,16 @@ Name: "desktopicon"; Description: "Create a desktop shortcut"; GroupDescription:
 [Files]
 Source: "{#SourceDir}\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
 
+[InstallDelete]
+; Older Paneleo builds copied Microsoft runtime DLLs locally. The current build
+; relies on the centrally serviced Visual C++ Redistributable instead.
+Type: files; Name: "{app}\_internal\VCRUNTIME140*.dll"
+Type: files; Name: "{app}\_internal\MSVCP140*.dll"
+Type: files; Name: "{app}\_internal\CONCRT140.dll"
+Type: files; Name: "{app}\_internal\PySide6\VCRUNTIME140*.dll"
+Type: files; Name: "{app}\_internal\PySide6\MSVCP140*.dll"
+Type: files; Name: "{app}\_internal\PySide6\CONCRT140.dll"
+
 [Icons]
 Name: "{autoprograms}\Paneleo"; Filename: "{app}\Paneleo.exe"; WorkingDir: "{app}"
 Name: "{autodesktop}\Paneleo"; Filename: "{app}\Paneleo.exe"; WorkingDir: "{app}"; Tasks: desktopicon
