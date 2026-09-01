@@ -32,12 +32,12 @@ Python is not required for either build. CBR/RAR files need [7-Zip](https://www.
 - Turn pages by clicking, using the keyboard, or using the on-screen controls.
 - Zoom, Fit Page, Fit Width, use manga direction, and read fullscreen.
 
-## Beta notes
+## A few notes
 
 - Paneleo currently supports 64-bit Windows.
 - BatCave support depends on the website and may need updates when the site changes.
 - Paneleo data is stored per Windows user in `%APPDATA%\Paneleo`. Uninstalling the app leaves that data in place.
-- Back up anything important and report reproducible problems through [GitHub Issues](https://github.com/dafka007/Paneleo/issues).
+- If something breaks, open an issue with the steps that caused it.
 
 ## Development
 
