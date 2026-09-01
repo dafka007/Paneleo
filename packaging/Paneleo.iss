@@ -52,6 +52,9 @@ Type: files; Name: "{app}\_internal\CONCRT140.dll"
 Type: files; Name: "{app}\_internal\PySide6\VCRUNTIME140*.dll"
 Type: files; Name: "{app}\_internal\PySide6\MSVCP140*.dll"
 Type: files; Name: "{app}\_internal\PySide6\CONCRT140.dll"
+Type: files; Name: "{app}\_internal\shiboken6\VCRUNTIME140*.dll"
+Type: files; Name: "{app}\_internal\shiboken6\MSVCP140*.dll"
+Type: files; Name: "{app}\_internal\shiboken6\CONCRT140.dll"
 
 [Icons]
 Name: "{autoprograms}\Paneleo"; Filename: "{app}\Paneleo.exe"; WorkingDir: "{app}"

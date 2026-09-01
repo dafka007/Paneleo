@@ -50,3 +50,4 @@ def test_installer_removes_obsolete_local_microsoft_runtimes():
     assert "VCRUNTIME140*.dll" in script
     assert "MSVCP140*.dll" in script
     assert "CONCRT140.dll" in script
+    assert "_internal\\shiboken6\\VCRUNTIME140*.dll" in script
