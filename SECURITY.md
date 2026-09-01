@@ -19,6 +19,6 @@ Paneleo treats downloaded comic archives/PDFs, imported backup files, embedded w
 - Paneleo keeps Qt WebEngine and Chromium's normal sandbox and integrity protections enabled.
 
 ## Reporting
-Do not post private backup files or crash logs publicly without reviewing them first; they may contain local filesystem paths.
+Report security vulnerabilities through GitHub's private vulnerability reporting for this repository. If that option is unavailable, do not open a public issue containing exploit details, private backup files, or unreviewed crash logs.
 
 Paneleo is not yet a public security-reviewed release. These controls are defense-in-depth and do not guarantee that every malicious document or web exploit is prevented.

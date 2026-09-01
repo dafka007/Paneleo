@@ -1,0 +1,68 @@
+name: Bug report
+description: Report something that is not working as expected
+title: "[Bug] "
+labels:
+  - bug
+body:
+  - type: input
+    id: paneleo-version
+    attributes:
+      label: Paneleo version
+      placeholder: 0.1.0-beta.1
+    validations:
+      required: true
+  - type: input
+    id: windows-version
+    attributes:
+      label: Windows version
+      placeholder: Windows 11 24H2
+    validations:
+      required: true
+  - type: dropdown
+    id: reader
+    attributes:
+      label: Where did the problem happen?
+      options:
+        - Local reader
+        - BatCave
+        - Somewhere else
+    validations:
+      required: true
+  - type: input
+    id: format
+    attributes:
+      label: Comic format, if relevant
+      placeholder: CBZ, CBR, or PDF
+  - type: textarea
+    id: activity
+    attributes:
+      label: What were you doing?
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      placeholder: |
+        1. Open...
+        2. Click...
+        3. See...
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual behavior
+    validations:
+      required: true
+  - type: textarea
+    id: media
+    attributes:
+      label: Screenshots or video
+      description: Add a screenshot or short recording if it helps explain the problem. Check it for private information first.

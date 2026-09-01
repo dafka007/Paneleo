@@ -43,11 +43,13 @@ Install 7-Zip from [7-zip.org](https://www.7-zip.org/) if you need CBR support. 
 
 ## Windows distributions
 
-The Windows installer installs Paneleo for the current user, creates a Start Menu shortcut, and can optionally create a desktop shortcut. It does not require administrator privileges or install Python. Upgrades retain Paneleo data in `%APPDATA%\Paneleo`, and uninstalling the application leaves that user data in place.
+The Windows installer installs Paneleo for all users under `C:\Program Files\Paneleo`, creates a Start Menu shortcut, and can optionally create a desktop shortcut. Installation, updates, and uninstalling require administrator permission. Python is not installed or required. Paneleo data remains separate for each Windows user in `%APPDATA%\Paneleo`, and uninstalling the application leaves that user data in place.
 
-The portable ZIP contains a self-contained `Paneleo` folder. Extract it, open the folder, and run `Paneleo.exe`; Python and development tools are not required. Portable builds use the same `%APPDATA%\Paneleo` data location as installed builds.
+The portable ZIP is the no-install, no-admin option. Extract it, open the self-contained `Paneleo` folder, and run `Paneleo.exe`; Python and development tools are not required. Portable builds use the same `%APPDATA%\Paneleo` data location as installed builds.
 
 7-Zip is not bundled with either distribution. Paneleo runs normally without it, but opening CBR/RAR-based comics requires a separate 7-Zip installation.
+
+Current Windows binaries are unsigned, so Windows SmartScreen may show an **Unknown Publisher** warning.
 
 ## Run from source
 
@@ -96,3 +98,9 @@ The installer and portable ZIP are written to `release\`. Generated release arti
 ## Beta status
 
 Paneleo `0.1.0-beta.1` is the first public beta. Back up important reading-list and bookmark data, and report reproducible issues with the file format and steps that triggered them.
+
+## License
+
+Paneleo is licensed under the [GNU General Public License v3.0](LICENSE).
+
+Copyright (C) 2026 dafka007
