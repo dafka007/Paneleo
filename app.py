@@ -4710,7 +4710,9 @@ class MainWindow(QMainWindow):
             cover_art.setScaledContents(False)
             outer.addWidget(cover_art, 0, Qt.AlignmentFlag.AlignHCenter)
 
-            progress = QProgressBar()
+            # Assign the card parent before changing visibility. A parentless
+            # QWidget becomes a temporary top-level Windows window when shown.
+            progress = QProgressBar(card)
             progress.setObjectName("CardProgress")
             progress.setProperty("state", state_kind)
             progress.setTextVisible(False)
