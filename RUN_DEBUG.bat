@@ -1,6 +1,6 @@
 @echo off
 cd /d "%~dp0"
-title Paneleo 2.0 Beta - Debug
+title Paneleo 0.1.0-beta.1 - Debug
 
 if not exist ".venv\Scripts\python.exe" (
     echo Paneleo is not installed yet.
@@ -9,7 +9,7 @@ if not exist ".venv\Scripts\python.exe" (
     if errorlevel 1 goto :fail
 )
 
-echo Starting Paneleo 2.0 beta in debug mode...
+echo Starting Paneleo 0.1.0-beta.1 in debug mode...
 ".venv\Scripts\python.exe" app.py 2>crash_log.txt
 set ERR=%errorlevel%
 

@@ -33,7 +33,7 @@ except Exception:
         fitz = None
 
 APP_NAME = "Paneleo"
-APP_VERSION = "2.0.0-beta8.4"
+APP_VERSION = "0.1.0-beta.1"
 BATCAVE_URL = "https://batcave.biz/"
 SUPPORTED = {".cbz", ".cbr", ".pdf"}
 IMAGE_EXTS = {".jpg", ".jpeg", ".png", ".webp", ".bmp", ".gif"}
@@ -4026,9 +4026,8 @@ class MainWindow(QMainWindow):
     def _queue_webengine_cover(self, series_name, page_url):
         """Fetch BatCave artwork inside the existing embedded browser context.
 
-        Beta 8 used a second QWebEnginePage for background artwork migration.
-        On Windows that page could briefly surface as a tiny blank Paneleo
-        window. 8.1 never creates or navigates a second page.
+        A separate QWebEnginePage could briefly surface as a tiny blank window
+        on Windows, so artwork requests always reuse the embedded browser.
         """
         key = (series_name or "").strip().lower()
         if not key:

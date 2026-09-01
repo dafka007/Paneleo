@@ -16,7 +16,7 @@ Paneleo treats downloaded comic archives/PDFs, imported backup files, embedded w
 - BatCave thumbnail filenames are SHA-256-derived identifiers rather than remote paths or titles.
 - The BatCave thumbnail cache is bounded to 160 files and older thumbnails are pruned.
 - In-memory cover caches remain bounded.
-- Paneleo 2.0 beta keeps the hardened v1.4.6 reader/browser behavior while restructuring the surrounding UI.
+- Paneleo keeps Qt WebEngine and Chromium's normal sandbox and integrity protections enabled.
 
 ## Reporting
 Do not post private backup files or crash logs publicly without reviewing them first; they may contain local filesystem paths.

@@ -1,10 +1,10 @@
 @echo off
 setlocal
 cd /d "%~dp0"
-title Paneleo 2.0 Beta - Installer
+title Paneleo 0.1.0-beta.1 - Installer
 
 echo ========================================
-echo          Paneleo 2.0 Beta
+echo       Paneleo 0.1.0-beta.1
 echo ========================================
 echo.
 

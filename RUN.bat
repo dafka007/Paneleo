@@ -1,7 +1,7 @@
 @echo off
 setlocal
 cd /d "%~dp0"
-title Paneleo 2.0 Beta
+title Paneleo 0.1.0-beta.1
 
 set "VENV_PY=.venv\Scripts\python.exe"
 set "VENV_PYW=.venv\Scripts\pythonw.exe"

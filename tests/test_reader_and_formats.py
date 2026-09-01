@@ -15,7 +15,7 @@ def _assert_rendered(reader, expected_pages):
 
 
 def test_main_window_initializes_without_crashing(main_window, paneleo_module):
-    assert main_window.windowTitle() == "Paneleo 2.0.0-beta8.4"
+    assert main_window.windowTitle() == "Paneleo 0.1.0-beta.1"
     assert main_window.pages.count() == 7
     assert main_window.pages.currentIndex() == paneleo_module.MainWindow.HOME
     assert main_window.isVisible()

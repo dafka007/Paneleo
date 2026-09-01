@@ -1,6 +1,6 @@
 # Paneleo
 
-Paneleo is a Windows desktop comic reader that combines a local comic library with an embedded BatCave browsing and reading experience. It is currently in beta (`2.0.0-beta8.4`).
+Paneleo is a Windows desktop comic reader that combines a local comic library with an embedded BatCave browsing and reading experience. The current version is the first public beta: `0.1.0-beta.1`.
 
 ## Main features
 
@@ -79,4 +79,4 @@ The script installs the pinned PyInstaller version, creates a clean Windows buil
 
 ## Beta status
 
-Paneleo 2.0 is beta software. Back up important reading-list and bookmark data, and report reproducible issues with the file format and steps that triggered them.
+Paneleo `0.1.0-beta.1` is the first public beta. Back up important reading-list and bookmark data, and report reproducible issues with the file format and steps that triggered them.

@@ -14,7 +14,7 @@ def _source_and_tree():
 def test_source_parses_and_compiles():
     source, tree = _source_and_tree()
     compile(tree, str(APP_PATH), "exec")
-    assert 'APP_VERSION = "2.0.0-beta8.4"' in source
+    assert 'APP_VERSION = "0.1.0-beta.1"' in source
 
 
 def test_expected_application_structure_is_present():
