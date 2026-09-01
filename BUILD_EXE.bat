@@ -36,6 +36,9 @@ if errorlevel 1 goto :fail
 "%VENV_PY%" -m PyInstaller --noconfirm --clean --windowed --name Paneleo --icon packaging\generated\Paneleo.ico --version-file packaging\generated\Paneleo-version.txt --collect-all PySide6.QtWebEngineCore --collect-all PySide6.QtWebEngineWidgets app.py
 if errorlevel 1 goto :fail
 
+"%VENV_PY%" packaging\finalize_distribution.py --project-root "%CD%" --distribution dist\Paneleo
+if errorlevel 1 goto :fail
+
 echo.
 echo Build complete.
 echo Your app is in: dist\Paneleo\Paneleo.exe

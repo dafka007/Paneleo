@@ -37,9 +37,12 @@ Press `F11` to enter or leave fullscreen and `Esc` to leave it. In local-reader 
 
 - Windows x64
 - 64-bit Python 3.10 through 3.14 (Python 3.12 recommended)
+- Microsoft Visual C++ 2015-2022 Redistributable (x64) for packaged builds
 - 7-Zip for CBR/RAR archive extraction
 
 Install 7-Zip from [7-zip.org](https://www.7-zip.org/) if you need CBR support. CBZ and PDF support do not require it.
+
+The Windows installer checks for the supported Microsoft Visual C++ x64 runtime and links to Microsoft's official download if it is missing. Paneleo does not bundle Microsoft runtime DLLs.
 
 ## Windows distributions
 
@@ -93,7 +96,7 @@ To create both Windows release formats, install [Inno Setup 7](https://jrsoftwar
 BUILD_RELEASE.bat
 ```
 
-The installer and portable ZIP are written to `release\`. Generated release artifacts are intentionally excluded from source control.
+The installer, portable ZIP, and corresponding-source ZIP are written to `release\`. Generated release artifacts are intentionally excluded from source control.
 
 ## Beta status
 
@@ -101,6 +104,8 @@ Paneleo `0.1.0-beta.1` is the first public beta. Back up important reading-list 
 
 ## License
 
-Paneleo is licensed under the [GNU General Public License v3.0](LICENSE).
+Paneleo-owned code is licensed under the [GNU Affero General Public License v3.0 only](LICENSE). Third-party components remain under their own licenses; see [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
+
+Each binary release includes a corresponding-source archive containing Paneleo's exact source and the source for bundled copyleft components. See [CORRESPONDING_SOURCE.md](CORRESPONDING_SOURCE.md).
 
 Copyright (C) 2026 dafka007

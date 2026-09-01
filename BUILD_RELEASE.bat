@@ -50,13 +50,18 @@ if not defined ISCC (
 "%ISCC%" /Qp "/DAppVersion=%APP_VERSION%" "/DAppVersionNumeric=%APP_VERSION_NUMERIC%" "/DSourceDir=%CD%\dist\Paneleo" "/DOutputDir=%CD%\release" packaging\Paneleo.iss
 if errorlevel 1 goto :fail
 
+"%VENV_PY%" packaging\create_corresponding_source.py --project-root "%CD%" --ref HEAD --output "release\Paneleo-Corresponding-Source-%APP_VERSION%.zip"
+if errorlevel 1 goto :fail
+
 if not exist "release\Paneleo-Setup-%APP_VERSION%.exe" goto :fail
 if not exist "release\Paneleo-Portable-%APP_VERSION%.zip" goto :fail
+if not exist "release\Paneleo-Corresponding-Source-%APP_VERSION%.zip" goto :fail
 
 echo.
 echo Windows distributions created successfully:
 echo   release\Paneleo-Setup-%APP_VERSION%.exe
 echo   release\Paneleo-Portable-%APP_VERSION%.zip
+echo   release\Paneleo-Corresponding-Source-%APP_VERSION%.zip
 echo.
 if /I "%~1"=="--no-pause" exit /b 0
 pause

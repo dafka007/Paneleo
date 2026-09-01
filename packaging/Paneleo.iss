@@ -35,6 +35,7 @@ RestartApplications=no
 UsePreviousAppDir=yes
 VersionInfoVersion={#AppVersionNumeric}
 VersionInfoProductVersion={#AppVersionNumeric}
+LicenseFile=..\LICENSE
 
 [Tasks]
 Name: "desktopicon"; Description: "Create a desktop shortcut"; GroupDescription: "Additional shortcuts:"; Flags: unchecked
@@ -48,3 +49,33 @@ Name: "{autodesktop}\Paneleo"; Filename: "{app}\Paneleo.exe"; WorkingDir: "{app}
 
 [Run]
 Filename: "{app}\Paneleo.exe"; Description: "Launch Paneleo"; Flags: nowait postinstall skipifsilent
+
+[Code]
+function InitializeSetup(): Boolean;
+var
+  Installed: Cardinal;
+  ErrorCode: Integer;
+begin
+  Result := RegQueryDWordValue(
+    HKLM64,
+    'SOFTWARE\Microsoft\VisualStudio\14.0\VC\Runtimes\x64',
+    'Installed',
+    Installed
+  ) and (Installed = 1);
+
+  if not Result then
+  begin
+    if MsgBox(
+      'Paneleo requires the Microsoft Visual C++ 2015-2022 Redistributable (x64). ' +
+      'Install it from Microsoft, then run Paneleo Setup again.' + #13#10 + #13#10 +
+      'Open the official Microsoft download page now?',
+      mbInformation,
+      MB_YESNO
+    ) = IDYES then
+      ShellExec(
+        'open',
+        'https://learn.microsoft.com/cpp/windows/latest-supported-vc-redist',
+        '', '', SW_SHOWNORMAL, ewNoWait, ErrorCode
+      );
+  end;
+end;
