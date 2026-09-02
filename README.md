@@ -1,17 +1,57 @@
 # Paneleo
 
-Paneleo is a Windows comic reader I made because I wanted one place for my local comics and BatCave.
+Paneleo is an independent Windows desktop comic reader built with Python and PySide6. It brings local CBZ, CBR, and PDF comics together with an integrated browser for BatCave.biz.
 
-This is the first public beta. It reads CBZ, CBR, and PDF files, keeps track of where you stopped, and includes an embedded BatCave reader.
+I made Paneleo because I wanted one Windows application for both my local comic library and the comics I read through BatCave.
 
 ## Download
 
-Go to the [Releases page](https://github.com/dafka007/Paneleo/releases) and choose one of these:
+Download Paneleo from the [Releases page](https://github.com/dafka007/Paneleo/releases).
 
-- **Installer:** download `Paneleo-Setup-0.1.0-beta.1.exe` for a normal Windows installation. It installs to Program Files and asks for administrator permission.
-- **Portable:** download `Paneleo-Portable-0.1.0-beta.1.zip`, extract it, open the `Paneleo` folder, and run `Paneleo.exe`. It does not need installation or administrator permission.
+- **Installer:** download `Paneleo-Setup-0.1.0-beta.1.exe` for a normal Windows installation. It installs to Program Files and requires administrator permission.
+- **Portable:** download `Paneleo-Portable-0.1.0-beta.1.zip`, extract it, open the `Paneleo` folder, and run `Paneleo.exe`. It does not require installation or administrator permission.
 
-Python is not required for either build. CBR/RAR files need [7-Zip](https://www.7-zip.org/) installed separately. The builds are currently unsigned, so Windows SmartScreen may show an **Unknown Publisher** warning.
+Python is not required for either build. The binaries are currently unsigned, so Windows SmartScreen may show an **Unknown Publisher** warning.
+
+## What Paneleo does
+
+Paneleo has two connected parts:
+
+- A local comic library and reader for files stored on your computer.
+- An integrated browser for browsing and reading comics on BatCave.biz.
+
+Reading progress, local-library settings, BatCave bookmarks, and reading-list entries are kept in your Windows user data.
+
+## BatCave reader
+
+Paneleo includes an integrated browser for browsing and reading comics on BatCave.biz without switching between separate applications. Bookmarks, recent issues, and reading-list entries are kept in Paneleo's local data.
+
+Because the integration depends on the BatCave.biz website, future website changes may temporarily affect parts of the reader until Paneleo is updated.
+
+Paneleo is an independent third-party application and is not affiliated with or endorsed by BatCave.biz.
+
+## Local comic reading
+
+Open a comic directly or choose a folder to create a local library. Paneleo saves your current page, generates cover thumbnails, and lets you continue reading from the Home screen.
+
+### Supported formats
+
+| Format | Notes |
+|---|---|
+| CBZ | Supported directly |
+| CBR/RAR | Requires [7-Zip](https://www.7-zip.org/) to be installed separately |
+| PDF | Supported through PyMuPDF |
+
+## Main features
+
+- Local comic library with covers and saved progress
+- Integrated BatCave.biz browsing and reading
+- Click, keyboard, and on-screen page navigation
+- Fullscreen reading
+- Zoom, Fit Page, and Fit Width
+- Manga reading direction
+- BatCave bookmarks, recent issues, and reading list
+- Installer and portable Windows builds
 
 ## Screenshots
 
@@ -19,34 +59,69 @@ Python is not required for either build. CBR/RAR files need [7-Zip](https://www.
 
 ![Paneleo local library with sample comics](docs/images/paneleo-library.png)
 
-### Local reader
+### Local comic reader
 
-![Paneleo local comic reader showing a sample comic](docs/images/paneleo-reader.png)
+![Paneleo local comic reader showing a sample comic](docs/images/paneleo-local-comic-reader.png)
 
-## Features
+## Installation
 
-- Open CBZ, CBR, and PDF comics or scan a folder into the local library.
-- Resume local comics with saved page progress and cover art.
-- Browse and read BatCave comics inside Paneleo.
-- Keep BatCave reading progress, bookmarks, recent issues, and reading-list entries.
-- Turn pages by clicking, using the keyboard, or using the on-screen controls.
-- Zoom, Fit Page, Fit Width, use manga direction, and read fullscreen.
+Paneleo currently supports 64-bit Windows.
 
-## A few notes
+The installer places Paneleo in `C:\Program Files\Paneleo`, creates a Start Menu shortcut, and registers a normal Windows uninstall entry. Uninstalling Paneleo leaves your per-user reading data in place.
 
-- Paneleo currently supports 64-bit Windows.
-- BatCave support depends on the website and may need updates when the site changes.
-- Paneleo data is stored per Windows user in `%APPDATA%\Paneleo`. Uninstalling the app leaves that data in place.
-- If something breaks, open an issue with the steps that caused it.
+The portable build can be extracted anywhere you have permission to write files.
+
+## How to run Paneleo
+
+After using the installer, open **Paneleo** from the Windows Start Menu.
+
+For the portable build:
+
+1. Extract the ZIP.
+2. Open the extracted `Paneleo` folder.
+3. Run `Paneleo.exe`.
+
+Do not move `Paneleo.exe` out of its folder; the bundled runtime files beside it are required.
+
+## Current version
+
+The current release is [Paneleo 0.1.0-beta.1](https://github.com/dafka007/Paneleo/releases/tag/v0.1.0-beta.1), the first public beta.
+
+## Security and privacy notes
+
+Paneleo stores its settings, progress, cache, and embedded-browser data under the current Windows user profile. Browser sessions may include locally stored website login data, so do not share your Paneleo AppData or browser-profile files.
+
+Comic archives, PDFs, imported data, remote artwork, and web content should be treated as untrusted input. Paneleo is beta software and has not had a formal security audit. See [SECURITY.md](SECURITY.md) for vulnerability reporting.
+
+## Known limitations
+
+- Only 64-bit Windows is currently supported.
+- CBR/RAR reading requires 7-Zip.
+- BatCave integration can be affected by changes to BatCave.biz.
+- The Windows binaries are unsigned.
+- This is beta software and may still contain bugs.
+
+## Troubleshooting
+
+- **CBR files do not open:** install the current 64-bit version of [7-Zip](https://www.7-zip.org/), then reopen Paneleo.
+- **Windows shows an Unknown Publisher warning:** the current builds are not code-signed.
+- **Paneleo reports a missing Microsoft runtime:** install the current [Microsoft Visual C++ Redistributable for x64](https://learn.microsoft.com/cpp/windows/latest-supported-vc-redist).
+- **BatCave pages no longer display correctly:** check for a newer Paneleo release and, if needed, [open an issue](https://github.com/dafka007/Paneleo/issues) with the steps that caused the problem.
 
 ## Development
 
-Paneleo uses Python, PySide6/Qt WebEngine, and PyMuPDF. See [docs/BUILDING.md](docs/BUILDING.md) for source setup, testing, and Windows build instructions.
+Source setup, testing, and Windows build instructions are in [docs/BUILDING.md](docs/BUILDING.md).
+
+Paneleo uses Python, PySide6/Qt WebEngine, and PyMuPDF.
 
 ## License and source
 
-Paneleo-owned code is licensed under [AGPL-3.0-only](LICENSE). Third-party components keep their own licenses; see [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
+Paneleo-owned code is licensed under [AGPL-3.0-only](LICENSE). Third-party components retain their own licenses; see [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
 
-Each binary release includes a corresponding-source archive with the exact Paneleo source and the source for bundled copyleft components. See [CORRESPONDING_SOURCE.md](CORRESPONDING_SOURCE.md).
+Each binary release includes a corresponding-source archive containing the matching Paneleo source and required upstream source archives. See [CORRESPONDING_SOURCE.md](CORRESPONDING_SOURCE.md).
 
 Copyright (C) 2026 dafka007
+
+## Disclaimer
+
+Paneleo is an independent third-party application. It is not made by, affiliated with, or endorsed by BatCave.biz. BatCave.biz is accessed through Paneleo's integrated browser; Paneleo does not operate the website or host its catalog.
