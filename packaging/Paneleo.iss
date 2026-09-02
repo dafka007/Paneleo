@@ -55,6 +55,12 @@ Type: files; Name: "{app}\_internal\PySide6\CONCRT140.dll"
 Type: files; Name: "{app}\_internal\shiboken6\VCRUNTIME140*.dll"
 Type: files; Name: "{app}\_internal\shiboken6\MSVCP140*.dll"
 Type: files; Name: "{app}\_internal\shiboken6\CONCRT140.dll"
+; Remove release-inapplicable Qt WebEngine debug resources left by older builds.
+Type: files; Name: "{app}\_internal\PySide6\resources\qtwebengine_devtools_resources.debug.pak"
+Type: files; Name: "{app}\_internal\PySide6\resources\qtwebengine_resources_100p.debug.pak"
+Type: files; Name: "{app}\_internal\PySide6\resources\qtwebengine_resources_200p.debug.pak"
+Type: files; Name: "{app}\_internal\PySide6\resources\qtwebengine_resources.debug.pak"
+Type: files; Name: "{app}\_internal\PySide6\resources\v8_context_snapshot.debug.bin"
 
 [Icons]
 Name: "{autoprograms}\Paneleo"; Filename: "{app}\Paneleo.exe"; WorkingDir: "{app}"

@@ -44,7 +44,7 @@ Create a clean folder build:
 Remove-Item build, dist, packaging\generated -Recurse -Force -ErrorAction SilentlyContinue
 Remove-Item Paneleo.spec -Force -ErrorAction SilentlyContinue
 .venv\Scripts\python.exe packaging\prepare_windows_assets.py --app app.py --output-dir packaging\generated
-.venv\Scripts\python.exe -m PyInstaller --noconfirm --clean --windowed --name Paneleo --icon packaging\generated\Paneleo.ico --version-file packaging\generated\Paneleo-version.txt --collect-all PySide6.QtWebEngineCore --collect-all PySide6.QtWebEngineWidgets app.py
+.venv\Scripts\python.exe -m PyInstaller --noconfirm --clean --windowed --name Paneleo --icon packaging\generated\Paneleo.ico --version-file packaging\generated\Paneleo-version.txt app.py
 .venv\Scripts\python.exe packaging\finalize_distribution.py --project-root . --distribution dist\Paneleo
 ```
 

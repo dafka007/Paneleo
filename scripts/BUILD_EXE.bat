@@ -33,7 +33,7 @@ del /q Paneleo.spec 2>nul
 "%VENV_PY%" packaging\prepare_windows_assets.py --app app.py --output-dir packaging\generated
 if errorlevel 1 goto :fail
 
-"%VENV_PY%" -m PyInstaller --noconfirm --clean --windowed --name Paneleo --icon packaging\generated\Paneleo.ico --version-file packaging\generated\Paneleo-version.txt --collect-all PySide6.QtWebEngineCore --collect-all PySide6.QtWebEngineWidgets app.py
+"%VENV_PY%" -m PyInstaller --noconfirm --clean --windowed --name Paneleo --icon packaging\generated\Paneleo.ico --version-file packaging\generated\Paneleo-version.txt app.py
 if errorlevel 1 goto :fail
 
 "%VENV_PY%" packaging\finalize_distribution.py --project-root "%CD%" --distribution dist\Paneleo

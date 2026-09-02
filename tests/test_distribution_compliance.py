@@ -9,6 +9,7 @@ assert SPEC and SPEC.loader
 FINALIZER = importlib.util.module_from_spec(SPEC)
 SPEC.loader.exec_module(FINALIZER)
 MICROSOFT_RUNTIME_DLLS = FINALIZER.MICROSOFT_RUNTIME_DLLS
+DEBUG_WEBENGINE_RESOURCES = FINALIZER.DEBUG_WEBENGINE_RESOURCES
 
 
 def test_repository_uses_agpl_and_has_release_notices():
@@ -27,10 +28,23 @@ def test_packaging_copies_notices_and_omits_microsoft_runtime_dlls(tmp_path):
     nested.mkdir(parents=True)
     for name in MICROSOFT_RUNTIME_DLLS:
         (nested / name).write_bytes(b"runtime")
+    resources = nested / "resources"
+    resources.mkdir()
+    for name in DEBUG_WEBENGINE_RESOURCES:
+        (resources / name).write_bytes(b"debug resource")
+    (resources / "qtwebengine_resources.pak").write_bytes(b"release resource")
+    (resources / "v8_context_snapshot.bin").write_bytes(b"release snapshot")
 
     removed = FINALIZER.finalize(PROJECT_ROOT, distribution)
-    assert len(removed) == len(MICROSOFT_RUNTIME_DLLS)
+    assert len(removed) == len(MICROSOFT_RUNTIME_DLLS) + len(DEBUG_WEBENGINE_RESOURCES)
     assert not any(path.name.lower() in MICROSOFT_RUNTIME_DLLS for path in distribution.rglob("*.dll"))
+    assert not any(
+        path.name.lower() in DEBUG_WEBENGINE_RESOURCES
+        for path in distribution.rglob("*")
+        if path.is_file()
+    )
+    assert (resources / "qtwebengine_resources.pak").is_file()
+    assert (resources / "v8_context_snapshot.bin").is_file()
     assert (distribution / "LICENSE").is_file()
     assert (distribution / "THIRD_PARTY_NOTICES.md").is_file()
     assert (distribution / "CORRESPONDING_SOURCE.md").is_file()
@@ -44,6 +58,11 @@ def test_release_builder_creates_all_three_release_assets():
     assert "Paneleo-Corresponding-Source-%APP_VERSION%.zip" in script
 
 
+def test_pyinstaller_build_relies_on_official_pyside6_hooks():
+    script = (PROJECT_ROOT / "scripts" / "BUILD_EXE.bat").read_text(encoding="utf-8")
+    assert "--collect-all PySide6" not in script
+
+
 def test_installer_removes_obsolete_local_microsoft_runtimes():
     script = (PROJECT_ROOT / "packaging" / "Paneleo.iss").read_text(encoding="utf-8")
     assert "[InstallDelete]" in script
@@ -51,3 +70,5 @@ def test_installer_removes_obsolete_local_microsoft_runtimes():
     assert "MSVCP140*.dll" in script
     assert "CONCRT140.dll" in script
     assert "_internal\\shiboken6\\VCRUNTIME140*.dll" in script
+    for name in DEBUG_WEBENGINE_RESOURCES:
+        assert name in script

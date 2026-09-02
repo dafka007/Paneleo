@@ -24,6 +24,14 @@ MICROSOFT_RUNTIME_DLLS = {
     "vcruntime140_1.dll",
 }
 
+DEBUG_WEBENGINE_RESOURCES = {
+    "qtwebengine_devtools_resources.debug.pak",
+    "qtwebengine_resources_100p.debug.pak",
+    "qtwebengine_resources_200p.debug.pak",
+    "qtwebengine_resources.debug.pak",
+    "v8_context_snapshot.debug.bin",
+}
+
 
 def finalize(project_root: Path, distribution: Path) -> list[Path]:
     project_root = project_root.resolve()
@@ -35,6 +43,11 @@ def finalize(project_root: Path, distribution: Path) -> list[Path]:
     removed: list[Path] = []
     for path in distribution.rglob("*.dll"):
         if path.name.lower() in MICROSOFT_RUNTIME_DLLS:
+            path.unlink()
+            removed.append(path)
+
+    for path in distribution.rglob("*"):
+        if path.is_file() and path.name.lower() in DEBUG_WEBENGINE_RESOURCES:
             path.unlink()
             removed.append(path)
 
@@ -59,6 +72,15 @@ def finalize(project_root: Path, distribution: Path) -> list[Path]:
     ]
     if remaining:
         raise RuntimeError(f"Microsoft runtime DLLs remain in payload: {remaining}")
+    remaining_debug_resources = [
+        path
+        for path in distribution.rglob("*")
+        if path.is_file() and path.name.lower() in DEBUG_WEBENGINE_RESOURCES
+    ]
+    if remaining_debug_resources:
+        raise RuntimeError(
+            f"Qt WebEngine debug resources remain in payload: {remaining_debug_resources}"
+        )
     return removed
 
 
@@ -68,10 +90,9 @@ def main() -> int:
     parser.add_argument("--distribution", type=Path, required=True)
     args = parser.parse_args()
     removed = finalize(args.project_root, args.distribution)
-    print(f"Copied release notices and removed {len(removed)} Microsoft runtime DLL(s).")
+    print(f"Copied release notices and removed {len(removed)} excluded distribution file(s).")
     return 0
 
 
 if __name__ == "__main__":
     raise SystemExit(main())
-
